@@ -18,7 +18,10 @@ public static class DependencyInjection
         services.AddDbContext<LibraryDbContext>(options =>
             options.UseSqlServer(connectionString));
 
-        services.AddScoped<IBookStore, EfBookStore>();
+        // services.AddScoped<IBookStore, EfBookStore>();
+
+         services.AddScoped<ILibraryDbContext>(provider =>
+            provider.GetRequiredService<LibraryDbContext>());//asks it for the already-registered DbContext.
 
         return services;
     }

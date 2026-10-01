@@ -1,9 +1,10 @@
 using Library.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Library.Application.Common.Interfaces;
 
 namespace Library.Infrastructure.Persistence;
 
-public class LibraryDbContext : DbContext
+public class LibraryDbContext : DbContext,ILibraryDbContext
 {
     public LibraryDbContext(DbContextOptions<LibraryDbContext> options) : base(options)
     {
