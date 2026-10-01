@@ -4,9 +4,9 @@ namespace Library.Application.Common.Interfaces;
 
 public interface IBookStore
 {
-    IReadOnlyList<BookDto> GetAll();
-    BookDto? GetById(int id);
-    BookDto Add(CreateBookRequest request);
-    bool Update(int id, CreateBookRequest request);
-    bool Delete(int id);
+    Task<IReadOnlyList<BookDto>> GetAllAsync();
+    Task<BookDto?> GetByIdAsync(int id);
+    Task<BookDto> AddAsync(CreateBookRequest request);
+    Task<bool> UpdateAsync(int id, CreateBookRequest request);
+    Task<bool> DeleteAsync(int id);
 }

@@ -19,16 +19,17 @@ public class BooksController : ControllerBase
 
     // GET api/books
     [HttpGet]
-    public ActionResult<IEnumerable<BookDto>> GetAll()
+    public async Task<ActionResult<IReadOnlyList<BookDto>>> GetAll()
     {
-        return Ok(_bookStore.GetAll());
+        var books = await _bookStore.GetAllAsync();
+        return Ok(books);
     }
 
     // GET api/books/1
     [HttpGet("{id:int}")]
-    public ActionResult<BookDto> GetById(int id)
+    public async Task<ActionResult<BookDto>> GetById(int id)
     {
-        var book = _bookStore.GetById(id);
+        var book = await _bookStore.GetByIdAsync(id);
 
         if (book is null)
             return NotFound();
@@ -38,17 +39,18 @@ public class BooksController : ControllerBase
 
     // POST api/books
     [HttpPost]
-    public ActionResult<BookDto> Create(CreateBookRequest request)
+    public async Task<ActionResult<BookDto>> Create(CreateBookRequest request)
     {
-         var book = _bookStore.Add(request);
+        var book = await _bookStore.AddAsync(request);
         return CreatedAtAction(nameof(GetById), new { id = book.Id }, book);
     }
 
+
     // PUT api/books/1
     [HttpPut("{id:int}")]
-    public IActionResult Update(int id, CreateBookRequest request)
+     public async Task<IActionResult> Update(int id, CreateBookRequest request)
     {
-       if (!_bookStore.Update(id, request))
+        if (!await _bookStore.UpdateAsync(id, request))
             return NotFound();
 
         return NoContent();
@@ -56,9 +58,9 @@ public class BooksController : ControllerBase
 
     // DELETE api/books/1
     [HttpDelete("{id:int}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        if (!_bookStore.Delete(id))
+        if (!await _bookStore.DeleteAsync(id))
             return NotFound();
 
         return NoContent();
