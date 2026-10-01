@@ -1,3 +1,5 @@
+using Library.Application.Books;
+using Library.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Library.Api.Controllers;
@@ -6,25 +8,27 @@ namespace Library.Api.Controllers;
 [Route("api/[controller]")]
 public class BooksController : ControllerBase
 {
-    // TEMPORARY: in-memory data until we add the database in Step 5
-    private static readonly List<BookDto> _books = new()
+     private readonly IBookStore _bookStore;
+
+
+//constructor injection, the standard DI pattern in .NET.
+    public BooksController(IBookStore bookStore)
     {
-        new BookDto(1, "Clean Code", "978-0132350884", 5),
-        new BookDto(2, "The Pragmatic Programmer", "978-0201616224", 3),
-    };
+        _bookStore = bookStore;
+    }
 
     // GET api/books
     [HttpGet]
     public ActionResult<IEnumerable<BookDto>> GetAll()
     {
-        return Ok(_books);
+        return Ok(_bookStore.GetAll());
     }
 
     // GET api/books/1
     [HttpGet("{id:int}")]
     public ActionResult<BookDto> GetById(int id)
     {
-        var book = _books.FirstOrDefault(b => b.Id == id);
+        var book = _bookStore.GetById(id);
 
         if (book is null)
             return NotFound();
@@ -36,11 +40,7 @@ public class BooksController : ControllerBase
     [HttpPost]
     public ActionResult<BookDto> Create(CreateBookRequest request)
     {
-        var newId = _books.Count == 0 ? 1 : _books.Max(b => b.Id) + 1;
-        var book = new BookDto(newId, request.Title, request.Isbn, request.TotalCopies);
-
-        _books.Add(book);
-
+         var book = _bookStore.Add(request);
         return CreatedAtAction(nameof(GetById), new { id = book.Id }, book);
     }
 
@@ -48,12 +48,9 @@ public class BooksController : ControllerBase
     [HttpPut("{id:int}")]
     public IActionResult Update(int id, CreateBookRequest request)
     {
-        var index = _books.FindIndex(b => b.Id == id);
-
-        if (index == -1)
+       if (!_bookStore.Update(id, request))
             return NotFound();
 
-        _books[index] = new BookDto(id, request.Title, request.Isbn, request.TotalCopies);
         return NoContent();
     }
 
@@ -61,16 +58,9 @@ public class BooksController : ControllerBase
     [HttpDelete("{id:int}")]
     public IActionResult Delete(int id)
     {
-        var book = _books.FirstOrDefault(b => b.Id == id);
-
-        if (book is null)
+        if (!_bookStore.Delete(id))
             return NotFound();
 
-        _books.Remove(book);
         return NoContent();
     }
 }
-
-// TEMPORARY: these move to the Application layer in Step 7
-public record BookDto(int Id, string Title, string Isbn, int TotalCopies);
-public record CreateBookRequest(string Title, string Isbn, int TotalCopies);

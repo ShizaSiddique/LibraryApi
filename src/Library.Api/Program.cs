@@ -1,6 +1,7 @@
 
 
-
+using Library.Application;
+using Library.Infrastructure;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +13,12 @@ builder.Services.AddControllers();
 
 
 // Registers OpenAPI, which auto-generates a JSON description of all your endpoints (routes, parameters, responses). Swagger and Scalar read this to build a test page.
-builder.Services.AddOpenApi(); 
+builder.Services.AddOpenApi();
+
+
+//Register the layers
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure();
 
 var app = builder.Build();
 
