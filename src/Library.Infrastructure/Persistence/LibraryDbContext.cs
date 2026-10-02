@@ -1,10 +1,12 @@
-using Library.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using Library.Application.Common.Interfaces;
+using Library.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace Library.Infrastructure.Persistence;
 
-public class LibraryDbContext : DbContext,ILibraryDbContext
+public class LibraryDbContext : IdentityDbContext<IdentityUser>, ILibraryDbContext
 {
     public LibraryDbContext(DbContextOptions<LibraryDbContext> options) : base(options)
     {
@@ -16,6 +18,7 @@ public class LibraryDbContext : DbContext,ILibraryDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(LibraryDbContext).Assembly);
     }
 }

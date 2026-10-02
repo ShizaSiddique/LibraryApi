@@ -1,40 +1,45 @@
-
 using Library.Application.Books;
 using Library.Application.Books.Commands;
 using Library.Application.Books.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Library.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class BooksController : ControllerBase
 {
-    private readonly ISender _sender; //ISender, MediatR's interface for sending requests.
+
+    ////ISender, MediatR's interface for sending requests.
     //It has no idea which handlers exist or what they do. 
     // That's the "mediator" idea: the sender and the handler don't know each other.
+    private readonly ISender _sender;
 
     public BooksController(ISender sender)
     {
         _sender = sender;
     }
 
-    // GET api/books
+    // GET api/books (anyone)
     [HttpGet]
+    [AllowAnonymous]
     public async Task<ActionResult<IReadOnlyList<BookDto>>> GetAll(CancellationToken ct)
     {
         return Ok(await _sender.Send(new GetBooksQuery(), ct));
     }
 
-    // GET api/books/1
+    // GET api/books/1 (anyone)
     [HttpGet("{id:int}")]
+    [AllowAnonymous]
     public async Task<ActionResult<BookDto>> GetById(int id, CancellationToken ct)
     {
         return Ok(await _sender.Send(new GetBookByIdQuery(id), ct));
     }
 
-    // POST api/books
+    // POST api/books (logged-in users)
     [HttpPost]
     public async Task<ActionResult<BookDto>> Create(CreateBookCommand command, CancellationToken ct)
     {
@@ -43,7 +48,7 @@ public class BooksController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id }, book);
     }
 
-    // PUT api/books/1
+    // PUT api/books/1 (logged-in users)
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, UpdateBookCommand command, CancellationToken ct)
     {
@@ -51,16 +56,14 @@ public class BooksController : ControllerBase
         return NoContent();
     }
 
-    // DELETE api/books/1
+    // DELETE api/books/1 (logged-in users)
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
         await _sender.Send(new DeleteBookCommand(id), ct);
         return NoContent();
     }
-}
-
-// public class BooksController : ControllerBase
+}// public class BooksController : ControllerBase
 // {
 //      private readonly ISender _bookStore;
 

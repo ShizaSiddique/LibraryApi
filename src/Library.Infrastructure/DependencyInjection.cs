@@ -1,5 +1,6 @@
 using Library.Application.Common.Interfaces;
 using Library.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,12 @@ public static class DependencyInjection
          services.AddScoped<ILibraryDbContext>(provider =>
             provider.GetRequiredService<LibraryDbContext>());//asks it for the already-registered DbContext.
 
+    ///Registers the services that check [Authorize] attributes and roles.
+        services.AddAuthorization();
+
+        services.AddIdentityApiEndpoints<IdentityUser>()
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<LibraryDbContext>();
         return services;
     }
 }

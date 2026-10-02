@@ -3,6 +3,7 @@
 using Library.Api.Middleware;
 using Library.Application;
 using Library.Infrastructure;
+using Microsoft.AspNetCore.Identity;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,8 +37,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();
+
+//MapIdentityApi:generates ready-made endpoints.
+//MapGroup("/api/auth"): puts them all under a common prefix, so /register becomes /api/auth/register, matching your other routes.
+app.MapGroup("/api/auth").MapIdentityApi<IdentityUser>().WithTags("Auth");
 
 app.Run();
