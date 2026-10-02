@@ -11,7 +11,7 @@ public class BorrowBookCommandHandler : IRequestHandler<BorrowBookCommand, int>
 {
 
       //The handler uses two dependencies: EF (_context) for the existence check, 
-        // and the procedure (_procedures) for the actual borrow. Mixing both is normal.
+        // and the procedure (_procedures) for the actual borrow. 
     private readonly ILibraryDbContext _context;
     private readonly ILoanProcedures _procedures;
 
